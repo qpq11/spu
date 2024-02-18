@@ -1,0 +1,104 @@
+push 6
+rpop 1
+rpush 1
+call 100
+out
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+hlt
+call 100
+rpush 1
+push 1
+sub
+rpop 1
+rpush 1
+mul
+ret 

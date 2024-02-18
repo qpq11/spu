@@ -1,0 +1,12 @@
+push 0
+rpop ax
+rpush ax
+push 1
+add
+rpop ax
+rpush ax
+rpush ax
+mul
+out
+jump 2
+hlt

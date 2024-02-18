@@ -1,0 +1,17 @@
+in
+rpop ax
+in
+rpop bx
+in
+rpop cx
+rpush bx
+rpush bx
+mul
+rpush ax
+rpush cx
+mul
+push 4
+mul
+sub
+out
+hlt
