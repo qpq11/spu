@@ -6,9 +6,9 @@
 
 struct stack
 {
-    size_t maxsize;    // Максимальную емкость stack
-    int top;        // Положение вершины stack 
-    int* items;     // Указатель на массив
+    size_t maxsize;
+    int top;
+    int* items;
 };
 
 struct spu
@@ -19,16 +19,18 @@ struct spu
 	int rbx;
 	int rcx;
 	int rdx;
-	int jmx; //переменная, содержащая счетчик jump с условием
+	int jmx; //variable keeping jump with condition
 };
 
 const int minVal = -6;
 
 const int maxVal = 66;
 
-const int maxLen = 16; //the biggest amount of digits possible in a valid command; if surpassed, program will read the first maxLen digits as one command and then go to the new one
+const int maxLen = 16; //the biggest amount of digits possible in a valid command; if surpassed, program will read the first maxLen digits as one command and then go on to the new one
 
-const int ExitCond = 1; //if during a recursion this number gets into stack, we exit
+const int capacity = 1000;
+
+const int ExitCond = 1; //the "beginner" condition for a recursion; if this or lesser value appears in stack, we return to main body
 
 enum Commands
 {
@@ -65,10 +67,12 @@ int main(int argc, char** argv)
 	
 	assert(fp != nullptr);
 	
-	struct spu* proc = newSpu(1000);
+	struct spu* proc = newSpu(capacity);
+	
+	assert(proc != nullptr);
 	
 	int* reads;
-	reads = (int*) calloc(sizeof(int), 1000);
+	reads = (int*) calloc(sizeof(int), capacity);
 	
 	char *s;
 	s = (char*) calloc(sizeof(char), maxLen);
@@ -78,7 +82,7 @@ int main(int argc, char** argv)
 	while((MyFgets(s, maxLen, fp)) != NULL)
 	{
 		int n = atoi(s);
-		printf("%d\n", n);
+		//printf("%d\n", n);
 		*(reads + i) = n;
 		i++;
 	}
@@ -87,15 +91,13 @@ int main(int argc, char** argv)
 	
 	while(ip < i)
 	{
-		printf("%d %d\n", ip, i);
+		//printf("%d %d\n", ip, i);
 		ip+= (1 + interpreter(&ip, proc, reads));
 		
-		/**if (interpreter(&ip, proc, reads)==1)
-			ip+=2;
-		else
-			ip++;*/
 		//printf("ip changed to %d\n", ip);
 	}
+	//stackDump(proc->stk);
+	SpuDtor(proc);
 	return 0;
 }
 
@@ -115,49 +117,44 @@ struct spu* newSpu(int capacity)
 
 int interpreter(int* ip, struct spu* pt, int* reads)
 {
-	printf("%d element in reads is %d\n", *(ip), reads[*(ip)]);
+	//printf("%d element in reads is %d\n", *(ip), reads[*(ip)]);
+	assert(pt != nullptr);
 	switch ((Commands) reads[*(ip)])
 	{
 		case chlt: 
 		{
-			printf("stumbled onto halt; program terminated. position %d\n", *ip);
+			//printf("stumbled onto halt; program terminated. position %d\n", *ip);
 			break;
 		}
 		case cpush: 
 		{
-			printf("push launched, gotta push %d\n", *(ip)+1);
+			//printf("push launched, gotta push %d\n", *(ip)+1);
 			push(pt->stk, reads[*(ip)+1]);
-			//j++;
 			return 1;
 		}
 		case cpop: 
 		{
 			pop(pt->stk);
-			//j++;
 			return 0;
 		}
 		case cadd: 
 		{
 			add(pt->stk);
-			//j++;
 			return 0;
 		}
 		case csub: 
 		{
 			sub(pt->stk);
-			//j++;
 			return 0;
 		}
 		case cdiv: 
 		{
 			di(pt->stk);
-			//j++;
 			return 0;
 		}
 		case sout: 
 		{
 			printf("Printing out %d\n", peek(pt->stk));
-			//j++;
 			//pop(pt->stk);
 			return 0;
 		}
@@ -173,7 +170,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 		}
 		case regpush:
 		{
-			printf("rpush launched, boutta push %d into stack\n", pt->rax);
+			//printf("rpush launched, boutta push %d into stack\n", pt->rax);
 			rpush(pt, reads[*(ip)+1]);
 			return 1;
 		}
@@ -184,9 +181,9 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 		}
 		case jmp:
 		{
-			puts("received jump");
+			//puts("received jump");
 			*ip = reads[*(ip)+1];
-			printf("Jumping to %d\n", *ip);
+			//printf("Jumping to %d\n", *ip);
 			return -1;
 		}
 		case jnl:
@@ -195,6 +192,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			{
 				*ip = reads[*(ip)+1];
 				(pt->jmx)--;
+				printf("j now equals %d\n", pt->jmx);
 				return 0;
 			}
 			return 1;
@@ -205,20 +203,21 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			{
 				*ip = reads[*(ip)+1];
 				(pt->jmx)++;
+				printf("j now equals %d\n", pt->jmx);
 				return 0;
 			}
 			return 1;
 		}
 		case pret:
 		{
-			printf("ret launched! register a is now %d, goin back if it's less or equals %d\n", pt->rax, ExitCond);
+			//printf("ret launched! register a is now %d, goin back if it's less or equals %d\n", pt->rax, ExitCond);
 			if (pt->rax > ExitCond)
 			{
 				*ip = peek(pt->retStk);
 				//pop(pt->retStk);
 				return -1;
 			}
-			printf("SNAPBACK TO REA- to the main body\n");
+			//printf("going back to the main body\n");
 			*ip = peek(pt->retStk) + 2;
 			return -1;
 			
@@ -229,7 +228,17 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			*ip = reads[*(ip)+1];
 			return 1;
 		}
+		default:
+		{
+			printf("unknown command: %d\n", reads[*(ip)]);
+		}
 	}
+}
+
+void jNullify(struct spu* pt)
+{
+	pt->jmx = 0;
+	//printf("jump counter nullified.\n");
 }
 
 char* MyFgets (char* str, size_t n, FILE * stream)
@@ -285,12 +294,19 @@ void rpush(struct spu* pt, int regn)
 			//pt->rdx = 0;
 			return;
 		}
+		default:
+		{
+			printf("incorrect register number, try again\n");
+			rpop(pt, regn);
+		}
 	}
 }
 
 void rpop(struct spu* pt, int regn)
 {
-	printf("rpop launched, boutta pop %d into register %d\n", peek(pt->stk), regn);
+	assert(pt != nullptr);
+	assert(regn > 0);
+	//printf("rpop launched, going to pop %d into register %d\n", peek(pt->stk), regn);
 	switch(regn)
 	{
 		case 1:
@@ -314,5 +330,23 @@ void rpop(struct spu* pt, int regn)
 			pt->rdx = pop(pt->stk);
 			return;
 		}
+		default:
+		{
+			printf("incorrect register number, try again\n");
+			rpop(pt, regn);
+		}
 	}
+}
+
+void SpuDtor(struct spu* pt)
+{
+	assert(pt != nullptr);
+	stackDtor(pt->stk);
+	stackDtor(pt->retStk);
+	pt->rax = 0;
+	pt->rbx = 0;
+	pt->rcx = 0;
+	pt->rdx = 0;
+	pt->jmx = 0;
+	free(pt);
 }

@@ -8,5 +8,5 @@ rpush ax
 rpush ax
 mul
 out
-jump 2
+jnm 3 10
 hlt

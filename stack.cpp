@@ -3,11 +3,13 @@
 #include "header.h"
 #include "clearBuffer.h"
 
+FILE * logStream = stdout;
+
 struct stack
 {
-    size_t maxsize;    // Максимальную емкость stack
-    int top;        // Положение вершины stack 
-    int* items;     // Указатель на массив
+    size_t maxsize;
+    int top;
+    int* items;     
 };
 
 /**int main()
@@ -50,6 +52,13 @@ struct stack* newStack(int capacity)
     return pt;
 }
 
+void stackDtor (struct stack* pt){
+	pt->maxsize = 0;
+	pt->top = 0;
+	free(pt->items);
+	free(pt);
+}
+
 int size(struct stack* pt) {
     return pt->top + 1;
 }
@@ -66,7 +75,7 @@ void push(struct stack* pt, int x)
 {
     if (isFull(pt))
     {
-        printf("STack overflow\nProgram killed\n");
+        printf("Stack overflow\nProgram killed\n");
         exit(EXIT_FAILURE);
     }
 
@@ -134,4 +143,36 @@ void in(struct stack* pt)
 	push(pt, a);
 	clearBuffer();
 	return;
+}
+
+void stackDump (struct stack* pt)
+{
+	if (pt->items == nullptr) 
+	{
+		fprintf (logStream, "Dump started.\n");
+		fprintf (logStream, " Empty stack: %17p\n", pt);
+		fprintf (logStream, " Size:     %10lld\n", size(pt));
+		fprintf (logStream, " Capacity: %10llu\n", pt->maxsize);
+		fprintf (logStream, " Address start: nullptr\n\n");
+	}
+	
+	else
+	{
+		fprintf (logStream, "Dump started.\n");
+		fprintf (logStream, " Empty stack: %17p\n", pt);
+		fprintf (logStream, " Size:     %10lld\n", size(pt));
+		fprintf (logStream, " Capacity: %10llu\n", pt->maxsize);
+		fprintf (logStream, " Address start: %p\n", pt->items);
+		fprintf (logStream, " Address   end: %p\n", pt->items + sizeof (int) * pt->maxsize);
+	}
+	
+	for (size_t i = 0; i < pt->maxsize; i++)
+	{
+		if (pt->items[i] == NULL)
+			fprintf (logStream, "| stack[%7d] = NULL VALUE |\n", i);
+		else
+			fprintf (logStream, "| stack[%7d] = %18d |\n", i, pt->items[i]);
+	}
+	
+	fprintf(logStream, "End of dump.\n");
 }
