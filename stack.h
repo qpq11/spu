@@ -20,7 +20,7 @@ int isFull(struct stack* pt);
 
 void push(struct stack* pt, int x);
 
-int peek(struct stack* pt);
+int top(struct stack* pt);
 
 int pop(struct stack* pt, int* x = nullptr);
 

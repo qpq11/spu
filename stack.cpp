@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "stack.h"
 #include "clearBuffer.h"
-#define fprintf LOG
+#define LOG(...) fprintf(__VA_ARGS__)
 
 FILE * logStream = stdout;
 
@@ -23,7 +23,7 @@ const int InitCapacity = 1000;
     int* items;     
 };**/
 
-int main()
+/*int main()
 {
 	//struct stack* pt = newStack(78);
 	struct stack* pt = (struct stack*)calloc(sizeof(struct stack), 1);
@@ -34,9 +34,9 @@ int main()
 	char s1[] = "";
 	char s2[] = "";
 	scanf("%s %s\n", s1, s2);
-    printf("The top element is %d\n", peek(pt));
+    printf("The top element is %d\n", top(pt));
     printf("The stack size is %d\n", pt->size);
-	printf("The top element is %d\n", peek(pt));
+	printf("The top element is %d\n", top(pt));
     printf("The stack size is %d\n", pt->size);
 
     pop(pt);
@@ -49,7 +49,7 @@ int main()
     else {
         printf("The stack is not empty");
     }
-} 
+}*/
 
 /*struct stack* newStack(int maxsize)
 {
@@ -129,7 +129,7 @@ int pop(struct stack* pt, int* x)
 	//assert(pt != nullptr);
 	assert(!isEmpty(pt));
 
-    LOG(logStream, "Removing %d\n", peek(pt));
+    LOG(logStream, "Removing %d\n", top(pt));
 	
     int popElem = pt->data[pt->size-1]; //e.g.: data = [1,2,3] => will make size=2 and print data[2] = 3
 	pt->size--;
