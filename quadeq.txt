@@ -8,10 +8,64 @@ rpush bx
 rpush bx
 mul
 rpush ax
+jz :aiszero
 rpush cx
 mul
 push 4
 mul
 sub
+push 0
+jl :noroots
+je :oneroot
+
+pop
+sqrt
+rpop dx
+rpush ax
+rpush ax
+add
+rpush bx
+neg
+rpush dx
+sub
+div
+out
+rpush ax
+rpush ax
+add
+rpush bx
+neg
+rpush dx
+add
+div
+out
+hlt
+
+:aiszero
+push 1
+out
+pop
+rpush bx
+neg
+rpush cx
+div
+out
+hlt
+
+:noroots
+out
+hlt
+
+:oneroot
+push 1
+out
+pop
+rpop dx
+rpush ax
+rpush ax
+add
+rpush bx
+neg
+div
 out
 hlt

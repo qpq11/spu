@@ -1,0 +1,35 @@
+in
+jz :zero
+push 0
+rpop dx
+rpop ax
+rpush ax
+push 0
+rpop bx
+push 1
+rpop cx
+call :fibo
+rpush dx
+out
+hlt
+org 100
+
+call :fibo
+rpush bx
+rpush cx
+add
+rpop dx
+rpush dx
+rpush cx
+rpop bx
+rpop cx
+rpush ax
+push 1
+sub
+rpop ax
+ret
+
+:zero
+push 0
+out
+hlt

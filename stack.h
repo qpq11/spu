@@ -6,27 +6,31 @@
 #include <string.h>
 #include <assert.h>
 
+typedef int elem_t;
+
 struct stack* newStack(int capacity);
+
+void stackCtor (struct stack* pt);
 
 void stackDtor (struct stack* pt);
 
 void stackDump (struct stack* pt);
 
-int* recallocStack (struct stack* const pt, const size_t capacity);
+elem_t* recallocStack (struct stack* const pt, const size_t capacity);
 
 int isEmpty(struct stack* pt);
 
 int isFull(struct stack* pt);
 
-void push(struct stack* pt, int x);
+void push(struct stack* pt, elem_t x);
 
-int top(struct stack* pt);
+elem_t top(struct stack* pt);
 
-int pop(struct stack* pt, int* x = nullptr);
+elem_t pop(struct stack* pt, elem_t* x = nullptr);
 
 int notHalfFull(struct stack* pt);
 
-void nullValueSet (int* data, size_t size);
+void nullValueSet (elem_t* data, size_t size);
 
 void stackIncrease (struct stack* pt);
 

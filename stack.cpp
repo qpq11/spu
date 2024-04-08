@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
-#include "clearBuffer.h"
 #define LOG(...) fprintf(__VA_ARGS__)
 
 FILE * logStream = stdout;
@@ -10,12 +9,13 @@ struct stack
 {
     size_t capacity = 0;
     size_t size = 0;
-    int* data = nullptr;     
+    elem_t* data = nullptr;     
 };
 
-const int POISON = (int) 0xDEADDEAD;
+const int POISON = 0xDEADDEAD;
 const int StackMultiplier = 2;
 const int InitCapacity = 1000;
+const int EmptyCoeff = 4;
 /*struct stack
 {
     size_t maxsize;
@@ -23,33 +23,35 @@ const int InitCapacity = 1000;
     int* items;     
 };**/
 
-/*int main()
-{
-	//struct stack* pt = newStack(78);
-	struct stack* pt = (struct stack*)calloc(sizeof(struct stack), 1);
-    push(pt, 1);
-    push(pt, 2);
-    push(pt, 3);
+// // int main()
+// // {
+	// // //struct stack* pt = newStack(78);
+	// // struct stack* pt = (struct stack*)calloc(sizeof(struct stack), 1);
+	// // stackCtor(pt);
+	// // printf("%d\n", isEmpty(pt));
+    // // push(pt, 1);
+    // // push(pt, 2);
+    // // push(pt, 3);
+	// // push(pt, POISON);
+	// // stackDump(pt);
+	// // //char s1[] = "";
+	// // //char s2[] = "";
+	// // //scanf("%s %s\n", s1, s2);
+    // // printf("The top element is %d\n", top(pt));
+    // // printf("The stack size is %d\n", pt->size);
+	// // pop(pt);
+	// // printf("The top element is %d\n", top(pt));
+    // // printf("The stack size is %d\n", pt->size);
+    // // pop(pt);
+    // // pop(pt);
 
-	char s1[] = "";
-	char s2[] = "";
-	scanf("%s %s\n", s1, s2);
-    printf("The top element is %d\n", top(pt));
-    printf("The stack size is %d\n", pt->size);
-	printf("The top element is %d\n", top(pt));
-    printf("The stack size is %d\n", pt->size);
-
-    pop(pt);
-    pop(pt);
-    pop(pt);
-
-    if (isEmpty(pt)) {
-        printf("The stack is empty");
-    }
-    else {
-        printf("The stack is not empty");
-    }
-}*/
+    // // if (isEmpty(pt)) {
+        // // printf("The stack is empty");
+    // // }
+    // // else {
+        // // printf("The stack is not empty");
+    // // }
+// // }
 
 /*struct stack* newStack(int maxsize)
 {
@@ -77,7 +79,7 @@ void stackCtor (struct stack* pt)
 	assert(pt != nullptr);
 	pt->capacity = InitCapacity;
 	pt->size = 0;
-	pt->data = (int*) calloc(InitCapacity, sizeof(int));
+	pt->data = (elem_t*) calloc(InitCapacity, sizeof(elem_t));
 }
 
 /*int size(struct stack* pt) {
@@ -94,12 +96,13 @@ int isFull(struct stack* pt)
     return pt->size == pt->capacity;
 }
 
-int notHalfFull(struct stack* pt)
+int considerablyEmpty(struct stack* pt)
 {
-	return (pt->capacity / StackMultiplier >= pt->size);
+	
+	return (pt->capacity / EmptyCoeff >= pt->size);
 }
 
-void push(struct stack* pt, int x)
+void push(struct stack* pt, elem_t x)
 {
     if (isFull(pt))
     {
@@ -113,25 +116,23 @@ void push(struct stack* pt, int x)
     pt->data[pt->size++] = x;
 }
 
-int top(struct stack* pt)
+elem_t top(struct stack* pt)
 {
     assert(pt != nullptr);
     if (!isEmpty(pt)) {
         return pt->data[pt->size - 1];
     }
-    else {
-        exit(EXIT_FAILURE);
-    }
+    return POISON;
 }
 
-int pop(struct stack* pt, int* x)
+elem_t pop(struct stack* pt, elem_t* x)
 {
 	//assert(pt != nullptr);
 	assert(!isEmpty(pt));
 
     LOG(logStream, "Removing %d\n", top(pt));
 	
-    int popElem = pt->data[pt->size-1]; //e.g.: data = [1,2,3] => will make size=2 and print data[2] = 3
+    elem_t popElem = pt->data[pt->size - 1]; //e.g.: data = [1,2,3] => will make size=2 and print data[2] = 3
 	pt->size--;
 	pt->data[pt->size] = POISON;
 	return popElem;
@@ -143,8 +144,8 @@ void stackDump (struct stack* pt)
 	{
 		LOG (logStream, "Dump started.\n");
 		LOG (logStream, " Empty stack: %17p\n", pt);
-		LOG (logStream, " Size:     %10lld\n", pt->size);
-		LOG (logStream, " Capacity: %10llu\n", pt->capacity);
+		LOG (logStream, " Size: %24u\n", pt->size);
+		LOG (logStream, " Capacity: %20u\n", pt->capacity);
 		LOG (logStream, " Address start: nullptr\n\n");
 	}
 	
@@ -152,28 +153,28 @@ void stackDump (struct stack* pt)
 	{
 		LOG (logStream, "Dump started.\n");
 		LOG (logStream, " Empty stack: %17p\n", pt);
-		LOG (logStream, " Size:     %10lld\n", pt->size);
-		LOG (logStream, " Capacity: %10llu\n", pt->capacity);
-		LOG (logStream, " Address start: %p\n", pt->data);
-		LOG (logStream, " Address   end: %p\n", pt->data + sizeof (int) * pt->capacity);
+		LOG (logStream, " Size: %24u\n", pt->size);
+		LOG (logStream, " Capacity: %20u\n", pt->capacity);
+		LOG (logStream, " Address start: %15p\n", pt->data);
+		LOG (logStream, " Address   end: %15p\n", pt->data + sizeof (elem_t) * pt->capacity);
 	}
 	
 	for (size_t i = 0; i < pt->capacity; i++)
 	{
-		if (pt->data[i] == POISON)
-			LOG (logStream, "| stack[%7d] = NULL VALUE |\n", i);
+		if (i >= pt->size)
+			LOG (logStream, "| stack[%7d] =         POISON |\n", i);
 		else
-			LOG (logStream, "| stack[%7d] = %18d |\n", i, pt->data[i]);
+			LOG (logStream, "| stack[%7d] = %18d |\n", i,  pt->data[i]);
 	}
 	
 	LOG(logStream, "End of dump.\n");
 }
 
-int* recallocStack (struct stack* pt, const size_t capacity)
+elem_t* recallocStack (struct stack* pt, const size_t capacity)
 {
     assert(pt != nullptr);
 
-    int* data = pt->data;
+    elem_t* data = pt->data;
 
     if (data == nullptr) 
     {
@@ -186,7 +187,7 @@ int* recallocStack (struct stack* pt, const size_t capacity)
     return data;
 }
 
-void nullValueSet (int* data, size_t size)
+void nullValueSet (elem_t* data, size_t size)
 {   
     for (size_t i = 0; i < size; i++)
     {
@@ -201,21 +202,21 @@ void stackIncrease (struct stack* pt)
         size_t newCapacity = pt->capacity;
         newCapacity = newCapacity * StackMultiplier;
         
-        int* data = recallocStack (pt, newCapacity);
+        elem_t* data = recallocStack (pt, newCapacity);
 
         assert (data != nullptr);
 
-        pt->data = (int*) data;
+        pt->data = (elem_t*) data;
         pt->capacity = newCapacity;
     }
 }
 
 void stackDecrease(struct stack* pt)
 {
-	if (notHalfFull(pt))
+	if (considerablyEmpty(pt))
 	{
-		size_t newCapacity = pt->capacity / StackMultiplier;
-		int* items = recallocStack(pt, newCapacity);
+		size_t newCapacity = pt->capacity / EmptyCoeff;
+		elem_t* items = recallocStack(pt, newCapacity);
 		
 		assert(items != nullptr);
 		

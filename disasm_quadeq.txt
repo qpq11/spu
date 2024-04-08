@@ -1,0 +1,71 @@
+in
+rpop 1
+in
+rpop 2
+in
+rpop 3
+rpush 2
+rpush 2
+mul
+rpush 1
+jz .L18
+rpush 3
+mul
+push 4
+mul
+sub
+push 0
+jl .L29
+je .L31
+
+pop
+sqrt
+rpop 4
+rpush 1
+rpush 1
+add
+rpush 2
+neg
+rpush 4
+sub
+di
+out
+rpush 1
+rpush 1
+add
+rpush 2
+neg
+rpush 4
+add
+di
+out
+hlt
+
+.L18
+push 1
+out
+pop
+rpush 2
+neg
+rpush 3
+di
+out
+hlt
+
+.L29
+out
+hlt
+
+.L31
+push 1
+out
+pop
+rpop 4
+rpush 1
+rpush 1
+add
+rpush 2
+neg
+di
+out
+hlt
