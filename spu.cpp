@@ -2,10 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-//#include "header.h"
 #include "spu.h"
 #include <assert.h>
-//#include "clearBuffer.h"
 #include "stack.h"
 
 struct spu
@@ -115,26 +113,44 @@ int main(int argc, char** argv)
 	SpuDtor(proc);
 	return 0;
 }
-
+//function detecting labels
 void DeLabel(int *reads, int i)
 {
 	while(i>=0)
 	{
 		int n = i;
 		int lbl = *(reads + i);
-		//printf("$%d %d\n", i, lbl);
+		//printf("$%d %d %d %d\n", i, lbl, *(reads + i), *(reads + i - 1));
 		if (lbl < minInt)
 		{
-			*(reads + i) = i;
-			//printf("$%d \n", i);
+			int defAddress = LabelDef(lbl, reads, n);
+			//printf("$%d \n", defAddress);
+			*(reads + i) = defAddress;
+			//printf("$%d \n", *(reads + i));
 			while(n>=0)
 			{
 				if (lbl == *(reads + n))
-					*(reads + n) = i;
+					*(reads + n) = defAddress;
 				n--;
 			}
 		}
 		i--;
+	}
+}
+
+
+//function that finds given label's definition and returns its address
+int LabelDef(int lbl, int* reads, int n)
+{
+	while (n>=0)
+	{
+		if ( *(reads + n) == lbl && *(reads + n - 1) == 0)
+		{
+			//printf("$###$ %d %d\n", *(reads + n), *(reads + n - 1));
+			//printf("$#$#$ %d %d\n", lbl, n);
+			return n;
+		}
+		n--;
 	}
 }
 
@@ -217,7 +233,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			///puts("received jump");
 			
 			*ip = reads[*(ip)+1];
-			///printf("Jumping to %d\n", *ip);
+			printf("Jumping to %d\n", *ip);
 			return 0;
 		}
 		case jnl:					//[rsp] <= [rsp + 4]
@@ -256,6 +272,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			push(pt->stk, a1);
 			if (a1 > a2)
 			{
+				puts("JL");
 				*ip = reads[*(ip)+1];
 				return 0;
 			}
@@ -282,6 +299,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			push(pt->stk, a1);
 			if (a1 == a2)
 			{
+				puts("JE");
 				*ip = reads[*(ip)+1];
 				return 0;
 			}
@@ -295,6 +313,7 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 			push(pt->stk, a1);
 			if (a1 != a2)
 			{
+				puts("JNE");
 				*ip = reads[*(ip)+1];
 				return 0;
 			}
@@ -313,21 +332,20 @@ int interpreter(int* ip, struct spu* pt, int* reads)
 		}
 		case pret:
 		{
-			//printf("ret launched! register a is now %d, goin back if it's less or equals %d\n", pt->rax, ExitRec);
-			if (pt->rax > ExitRec)
-			{
-				*ip = top(pt->retStk);
-				//pop(pt->retStk);
-				return -1;
-			}
-			//printf("going back to the main body\n");
+			printf("ret launched!\n");
+			//if (pt->rax > ExitRec)
+			//{
 			*ip = top(pt->retStk) + 2;
+			//pop(pt->retStk);
 			return -1;
+			//}
+			//printf("going back to the main body\n");
+			// *ip = top(pt->retStk) + 2; 			// return -1;
 			
 		}
 		case pcall:
 		{
-			//printf("called pcall, will save %d to retStk\n", *ip);
+			printf("called pcall, will save %d to retStk\n", *ip);
 			push(pt->retStk, *ip); //return to the command right after "call x"
 			*ip = reads[*(ip)+1];
 			//printf("$$$$%d \n", *ip);
@@ -470,6 +488,7 @@ void SpuDtor(struct spu* pt)
 
 void add(struct stack* pt)
 {
+	puts("adding");
 	elem_t a = pop(pt);
 	elem_t b = pop(pt);
 	push(pt, a+b);
@@ -488,6 +507,7 @@ void ddiv(struct stack* pt)
 
 void sub(struct stack* pt)
 {
+	puts("subing");
 	elem_t a = pop(pt);
 	elem_t b = pop(pt);
 	push(pt, b-a);
@@ -513,6 +533,7 @@ void in(struct stack* pt)
 
 void root(struct stack* pt)
 {
+	puts("doing sqrt\n");
 	elem_t a = pop(pt);
 	if (a<0)
 	{

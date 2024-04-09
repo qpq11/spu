@@ -1,4 +1,5 @@
 in
+jz .L3
 push 0
 rpop 4
 rpop 1
@@ -7,7 +8,7 @@ push 0
 rpop 2
 push 1
 rpop 3
-call .L19
+call .L21
 rpush 4
 out
 hlt
@@ -86,10 +87,7 @@ hlt
 hlt
 hlt
 hlt
-hlt
-hlt
-
-call .L19
+.L21
 rpush 2
 rpush 3
 add
@@ -102,4 +100,11 @@ rpush 1
 push 1
 sub
 rpop 1
-ret 
+rpush 1
+push 1
+jne .L21
+ret 0
+.L3
+push 0
+out
+hlt

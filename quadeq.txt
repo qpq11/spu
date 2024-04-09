@@ -17,7 +17,12 @@ sub
 push 0
 jl :noroots
 je :oneroot
+jump :tworoot
 
+:tworoot
+push 2
+out
+pop
 pop
 sqrt
 rpop dx

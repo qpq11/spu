@@ -135,7 +135,8 @@ int main(int argc, char** argv)
 		printf("got %s\n", s);
 		if(!strcmp(s, ""))
 		{
-			fprintf(resfp, "\n");
+			fprintf(resfp, "0\n");
+			ip++;
 			continue;
 		}
 		if (!strcmp(s, "org"))
@@ -187,7 +188,7 @@ int main(int argc, char** argv)
 		int as = MyAssembler(s);
 		ip++;
 		//printf("turned into %d\n", as);
-		if ((as>0) && (!NewLineCondition))
+		if ((as>0) && (as!=pret) && (!NewLineCondition))
 		{
 			fprintf(resfp, "%d ", as);
 			NewLineCondition = 1;

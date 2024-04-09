@@ -69,7 +69,7 @@ const char* texts[] = {"hlt", "push", "pop", "neg", "sqrt", "add", "sub", "div",
 	{"call", pcall   }
 };*/
 
-const char* MyDisassembler (int n, int cond);
+const char* MyDisassembler (int n, int NoNewLine);
 
 int main(int argc, char** argv)
 {
@@ -80,7 +80,7 @@ int main(int argc, char** argv)
 	else
 		fp = fopen("asm.txt", "r");
 	
-	int cond = 0; //condition not to use the '\n' symbol
+	int NoNewLine = 0; //condition not to use the '\n' symbol
 	
 	res = fopen("disasm.txt", "w");
 	
@@ -102,30 +102,30 @@ int main(int argc, char** argv)
 		{
 			printf("%s\n", s);
 			fprintf(res, "%s\n", s);
-			cond = 0;
+			NoNewLine = 0;
 			continue;
 		}
 		int n = atoi(s);
 		printf("%d ", n);
 		//char *buf;
 		//buf = (char*) calloc(sizeof(char), 16);
-		dis = MyDisassembler(n, cond);
+		dis = MyDisassembler(n, NoNewLine);
 		//free(buf);
 		printf("%s\n", dis);
-		if ((n>0) && (!cond))
+		if ((n>0) && (!NoNewLine))
 		{
 			fprintf(res, "%s ", dis);
-			cond = 1;
+			NoNewLine = 1;
 		}
-		else if (cond)
+		else if (NoNewLine)
 		{
 			fprintf(res, "%d\n", n);
-			cond = 0;
+			NoNewLine = 0;
 		}
 		else
 		{
 			fprintf(res, "%s\n", dis);
-			cond = 0;
+			NoNewLine = 0;
 		}
 	}
 	fclose(fp);
@@ -134,9 +134,9 @@ int main(int argc, char** argv)
 	//int i = 0;
 }
 
-const char* MyDisassembler(int n, int cond)
+const char* MyDisassembler(int n, int NoNewLine)
 {
-	if (cond)
+	if (NoNewLine)
 	{
 		return "";
 	}

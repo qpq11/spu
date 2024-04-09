@@ -19,11 +19,13 @@ const int maxLen = 18; //the biggest amount of digits possible in a valid comman
 
 const int InitCapacity = 1000;
 
-const int ExitRec = 1; //the "beginner" condition for a recursion; if this or lesser value appears in stack, we return to main body
+//const int ExitRec = 1; //the "beginner" condition for a recursion; if this or lesser value appears in stack, we return to main body
 
 char* MyFgets (char* str, size_t n, FILE * stream);
 
 void DeLabel(int *reads, int i);
+
+int LabelDef(int lbl, int* reads, int n);
 
 struct spu* newSpu(int capacity);
 

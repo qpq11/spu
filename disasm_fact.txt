@@ -2,7 +2,9 @@ in
 jz .L3
 rpop 1
 rpush 1
-call .L9
+rpop 2
+call .L11
+rpush 2
 out
 hlt
 hlt
@@ -90,19 +92,19 @@ hlt
 hlt
 hlt
 hlt
-hlt
-hlt
-hlt
-hlt
-
-.L9
+.L11
 rpush 1
 push 1
 sub
 rpop 1
 rpush 1
+rpush 2
 mul
-ret 
+rpop 2
+rpush 1
+push 1
+jne .L11
+ret 0
 .L3
 push 1
 out

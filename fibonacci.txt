@@ -12,9 +12,9 @@ call :fibo
 rpush dx
 out
 hlt
-org 100
 
-call :fibo
+org 100
+:fibo
 rpush bx
 rpush cx
 add
@@ -27,6 +27,9 @@ rpush ax
 push 1
 sub
 rpop ax
+rpush ax
+push 1
+jne :fibo
 ret
 
 :zero

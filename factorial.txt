@@ -2,18 +2,25 @@ in
 jz :zero
 rpop ax
 rpush ax
+rpop bx
 call :fact
+rpush bx
 out
 hlt
-org 100
 
+org 100
 :fact
 rpush ax
 push 1
 sub
 rpop ax
 rpush ax
+rpush bx
 mul
+rpop bx
+rpush ax
+push 1
+jne :fact
 ret
 
 :zero
