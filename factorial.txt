@@ -1,4 +1,6 @@
 in
+rpop ax
+rpush ax
 jz :zero
 rpop ax
 rpush ax
@@ -20,7 +22,10 @@ mul
 rpop bx
 rpush ax
 push 1
-jne :fact
+jne :ret
+call :fact
+
+:ret
 ret
 
 :zero
